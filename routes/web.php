@@ -1,29 +1,61 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-<<<<<<< HEAD
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Jobseeker\JobseekerDashboardController;
 use App\Http\Controllers\Employer\EmployerDashboardController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Government\GovernmentDashboardController;
 
-Route::prefix('employer')->middleware(['web'])->group(function () {
-    Route::get('/dashboard', [EmployerDashboardController::class, 'index'])->name('employer.dashboard');
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
+
+// Auth routes
+Auth::routes();
+
+// Profile routes (for "profile.edit" error fix)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::prefix('admin')->middleware(['web'])->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('admin.dashboard');
+// Jobseeker dashboard
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/jobseeker/dashboard', [JobseekerDashboardController::class, 'index'])->name('jobseeker.dashboard');
 });
-=======
-use App\Http\Controllers\HomeController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+// Employer dashboard
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/employer/dashboard', [EmployerDashboardController::class, 'index'])->name('employer.dashboard');
+});
 
-Route::get('/', [HomeController::class, 'index']);
->>>>>>> 3440896b19834a125e379e78170c4d2876d4c05c
+// Admin dashboard
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+});
+
+// Government dashboard
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/government/dashboard', [GovernmentDashboardController::class, 'index'])->name('government.dashboard');
+});
+
+// Fallback dashboard route for navigation links
+Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
+    $user = Auth::user();
+
+    switch ($user->role) {
+        case 'jobseeker':
+            return redirect()->route('jobseeker.dashboard');
+        case 'employer':
+            return redirect()->route('employer.dashboard');
+        case 'admin':
+            return redirect()->route('admin.dashboard');
+        case 'government':
+            return redirect()->route('government.dashboard');
+        default:
+            abort(403, 'Unauthorized.');
+    }
+})->name('dashboard');

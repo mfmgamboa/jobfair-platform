@@ -1,0 +1,1 @@
+-- SQL schema placeholder for jobseekers, employers, admin, government

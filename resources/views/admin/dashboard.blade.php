@@ -1,51 +1,41 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Admin Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            color: #212529;
-        }
-        .navbar {
-            background-color: #004b8d;
-        }
-        .navbar-brand, .nav-link {
-            color: #fff !important;
-        }
-        .btn-orange {
-            background-color: #ff8c00;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-<nav class="navbar navbar-expand-lg">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Admin Panel</a>
-    </div>
-</nav>
-<div class="container mt-4">
-    <h1 class="mb-4">Welcome, Admin</h1>
-    <div class="row">
-        <div class="col-md-6">
-            <h3>Job Seekers</h3>
-            <ul class="list-group">
-                @foreach($jobSeekers as $seeker)
-                    <li class="list-group-item">{{ $seeker->name }} - {{ $seeker->email }}</li>
-                @endforeach
-            </ul>
-        </div>
-        <div class="col-md-6">
-            <h3>Employers</h3>
-            <ul class="list-group">
-                @foreach($employers as $employer)
-                    <li class="list-group-item">{{ $employer->company_name }} - {{ $employer->email }}</li>
-                @endforeach
-            </ul>
+@extends('layouts.app')
+
+@section('content')
+<div class="container mx-auto py-8">
+    <div class="bg-white rounded-2xl shadow-md p-6">
+        <h1 class="text-2xl font-bold text-red-800 mb-4">Admin Dashboard</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="p-4 bg-red-100 rounded-xl shadow">
+                <h2 class="text-lg font-semibold text-red-700">Manage Jobseekers</h2>
+                <p class="text-gray-700 mt-2">View, edit, or delete jobseeker accounts and profiles.</p>
+            </div>
+
+            <div class="p-4 bg-blue-100 rounded-xl shadow">
+                <h2 class="text-lg font-semibold text-blue-700">Manage Employers</h2>
+                <p class="text-gray-700 mt-2">Approve companies, review job posts, and manage booths.</p>
+            </div>
+
+            <div class="p-4 bg-green-100 rounded-xl shadow">
+                <h2 class="text-lg font-semibold text-green-700">Manage Government Users</h2>
+                <p class="text-gray-700 mt-2">Add, assign, or review government accounts and reports.</p>
+            </div>
+
+            <div class="p-4 bg-yellow-100 rounded-xl shadow">
+                <h2 class="text-lg font-semibold text-yellow-700">Analytics & Reports</h2>
+                <p class="text-gray-700 mt-2">Track platform usage, attendance, and hire rates.</p>
+            </div>
+
+            <div class="p-4 bg-purple-100 rounded-xl shadow">
+                <h2 class="text-lg font-semibold text-purple-700">Platform Settings</h2>
+                <p class="text-gray-700 mt-2">Change system settings, manage modules, or enable features.</p>
+            </div>
+
+            <div class="p-4 bg-gray-100 rounded-xl shadow">
+                <h2 class="text-lg font-semibold text-gray-700">Audit Logs</h2>
+                <p class="text-gray-700 mt-2">View user actions and system activity for transparency.</p>
+            </div>
         </div>
     </div>
 </div>
-</body>
-</html>
+@endsection
