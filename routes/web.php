@@ -7,6 +7,7 @@ use App\Http\Controllers\Jobseeker\JobseekerDashboardController;
 use App\Http\Controllers\Employer\EmployerDashboardController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Government\GovernmentDashboardController;
+use App\Http\Controllers\ResumeController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -15,7 +16,7 @@ Route::get('/', function () {
 // Auth routes
 Auth::routes();
 
-// Profile routes (for "profile.edit" error fix)
+// Profile routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -42,20 +43,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/government/dashboard', [GovernmentDashboardController::class, 'index'])->name('government.dashboard');
 });
 
-// Fallback dashboard route for navigation links
-Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
-    $user = Auth::user();
-
-    switch ($user->role) {
-        case 'jobseeker':
-            return redirect()->route('jobseeker.dashboard');
-        case 'employer':
-            return redirect()->route('employer.dashboard');
-        case 'admin':
-            return redirect()->route('admin.dashboard');
-        case 'government':
-            return redirect()->route('government.dashboard');
-        default:
-            abort(403, 'Unauthorized.');
-    }
-})->name('dashboard');
+// Resume Upload & Parsing (PDF/DOC)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/resume/upload', [ResumeController::class, 'upload'])->name('resume.upload');
+    Route::post('/resume/parse', [ResumeController::class, 'parse'])->name('resume.parse');
+});
