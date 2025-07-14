@@ -13,5 +13,17 @@ class Employer extends Model
         'company_name',
         'email',
         'password',
+        'peso_approved',
+        'dole_approved',
     ];
+
+    protected $casts = [
+        'peso_approved' => 'boolean',
+        'dole_approved' => 'boolean',
+    ];
+
+    public function documents()
+    {
+        return $this->hasMany(EmployerDocument::class);
+    }
 }

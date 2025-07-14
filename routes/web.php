@@ -5,18 +5,27 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Jobseeker\JobseekerDashboardController;
 use App\Http\Controllers\Employer\EmployerDashboardController;
+use App\Http\Controllers\Employer\DocumentController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Government\GovernmentDashboardController;
 use App\Http\Controllers\ResumeController;
+use App\Http\Controllers\Government\GovernmentAuthController;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Auth routes
+// Laravel default auth (for jobseekers, employers, admins)
 Auth::routes();
 
-// Profile routes
+// Government login/logout
+Route::prefix('government')->group(function () {
+    Route::get('/login', [GovernmentAuthController::class, 'showLoginForm'])->name('government.login');
+    Route::post('/login', [GovernmentAuthController::class, 'login'])->name('government.login.submit');
+    Route::post('/logout', [GovernmentAuthController::class, 'logout'])->name('government.logout');
+});
+
+// Profile routes (shared)
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -31,6 +40,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Employer dashboard
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/employer/dashboard', [EmployerDashboardController::class, 'index'])->name('employer.dashboard');
+
+    // Employer Document Upload
+    Route::get('/employer/documents', [DocumentController::class, 'index'])->name('employer.documents');
+    Route::post('/employer/documents', [DocumentController::class, 'upload'])->name('employer.documents.upload');
 });
 
 // Admin dashboard
@@ -38,12 +51,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 });
 
-// Government dashboard
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/government/dashboard', [GovernmentDashboardController::class, 'index'])->name('government.dashboard');
+// Government dashboard & approval (custom guard)
+Route::middleware(['auth:government'])->prefix('government')->group(function () {
+    Route::get('/dashboard', [GovernmentDashboardController::class, 'index'])->name('government.dashboard');
+    Route::post('/approve-document', [GovernmentDashboardController::class, 'approveDocument'])->name('government.document.approve');
 });
 
-// Resume Upload & Parsing (PDF/DOC)
+// Resume upload & parsing
 Route::middleware(['auth'])->group(function () {
     Route::get('/resume/upload', [ResumeController::class, 'upload'])->name('resume.upload');
     Route::post('/resume/parse', [ResumeController::class, 'parse'])->name('resume.parse');
