@@ -22,11 +22,7 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-
-        'government' => [
-            'driver' => 'session',
-            'provider' => 'government_users',
-        ],
+        // Removed 'government' guard
     ],
 
     /*
@@ -39,11 +35,7 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-
-        'government_users' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\GovernmentUser::class,
-        ],
+        // Removed 'government_users' provider
     ],
 
     /*

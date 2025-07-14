@@ -2,9 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+
+// Shared
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResumeController;
+
+// Chat
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ChatController;
 
 // Jobseeker
 use App\Http\Controllers\Jobseeker\JobseekerDashboardController;
@@ -20,15 +25,21 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Government\GovernmentDashboardController;
 use App\Http\Controllers\Government\GovernmentAuthController;
 
-// 🔹 Home route
+//
+// 🔹 Home
+//
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// 🔹 Laravel built-in auth for jobseekers, employers, admins
+//
+// 🔹 Auth (default for jobseekers, employers, admins)
+//
 Auth::routes();
 
-// 🔹 Government custom auth
+//
+// 🔹 Government Authentication
+//
 Route::prefix('government')->group(function () {
     Route::get('/login', [GovernmentAuthController::class, 'showLoginForm'])->name('government.login');
     Route::post('/login', [GovernmentAuthController::class, 'login'])->name('government.login.submit');
@@ -40,37 +51,50 @@ Route::prefix('government')->group(function () {
     });
 });
 
-// 🔹 Authenticated user routes
+//
+// 🔹 Authenticated Routes (Jobseeker, Employer, Admin)
+//
 Route::middleware('auth')->group(function () {
-    // Shared Profile
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Resume Upload & Parsing
+    // Resume Upload/Parsing
     Route::get('/resume/upload', [ResumeController::class, 'upload'])->name('resume.upload');
     Route::post('/resume/parse', [ResumeController::class, 'parse'])->name('resume.parse');
 
-    // Messaging
+    // Messaging (Inbox view)
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+
+    // Chat (Real-time contacts & messages)
+    Route::get('/chat/contacts', [ChatController::class, 'index'])->name('chat.contacts');
+    Route::get('/chat/messages/{user}', [ChatController::class, 'fetchMessages'])->name('chat.messages');
+    Route::post('/chat/messages', [ChatController::class, 'sendMessage'])->name('chat.send');
 });
 
-// 🔹 Jobseeker dashboard
+//
+// 🔹 Jobseeker Routes
+//
 Route::middleware(['auth', 'verified'])->prefix('jobseeker')->name('jobseeker.')->group(function () {
     Route::get('/dashboard', [JobseekerDashboardController::class, 'index'])->name('dashboard');
 });
 
-// 🔹 Employer routes
+//
+// 🔹 Employer Routes
+//
 Route::middleware(['auth', 'verified'])->prefix('employer')->name('employer.')->group(function () {
     Route::get('/dashboard', [EmployerDashboardController::class, 'index'])->name('dashboard');
 
-    // Document Upload
+    // Document upload for employer
     Route::get('/documents', [DocumentController::class, 'index'])->name('documents');
     Route::post('/documents', [DocumentController::class, 'upload'])->name('documents.upload');
 });
 
-// 🔹 Admin dashboard
+//
+// 🔹 Admin Routes
+//
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 });

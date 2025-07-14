@@ -3,46 +3,69 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 use App\Models\Message;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use App\Events\MessageSent;
 
 class MessageController extends Controller
 {
-    // Fetch all messages between the authenticated user and the selected receiver
-    public function index(Request $request)
+    /**
+     * Show all conversations for the authenticated user.
+     */
+    public function index()
     {
-        $receiverId = $request->query('receiver_id');
+        $user = Auth::user();
 
-        $messages = Message::where(function ($query) use ($receiverId) {
-                $query->where('sender_id', Auth::id())
-                      ->where('receiver_id', $receiverId);
-            })
-            ->orWhere(function ($query) use ($receiverId) {
-                $query->where('sender_id', $receiverId)
-                      ->where('receiver_id', Auth::id());
-            })
-            ->orderBy('created_at', 'asc')
-            ->get();
+        // Only fetch users they’re allowed to message based on role
+        if ($user->hasRole('employer')) {
+            $messages = Message::where('sender_id', $user->id)
+                ->orWhere('receiver_id', $user->id)
+                ->with('sender', 'receiver')
+                ->latest()
+                ->get();
+        } elseif ($user->hasRole('jobseeker')) {
+            $messages = Message::where('sender_id', $user->id)
+                ->orWhere('receiver_id', $user->id)
+                ->with('sender', 'receiver')
+                ->latest()
+                ->get();
+        } else {
+            $messages = collect(); // No access for other roles
+        }
 
         return response()->json($messages);
     }
 
-    // Store a new message
+    /**
+     * Store and broadcast a new message.
+     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'receiver_id' => 'required|exists:users,id',
-            'message' => 'required|string',
+            'message' => 'required|string|max:1000',
         ]);
+
+        $sender = Auth::user();
+        $receiver = User::findOrFail($request->receiver_id);
+
+        // Role-based access control
+        if ($sender->hasRole('jobseeker') && !$receiver->hasRole('employer')) {
+            return response()->json(['error' => 'Unauthorized.'], 403);
+        }
+
+        if ($sender->hasRole('employer') && !$receiver->hasRole('jobseeker')) {
+            return response()->json(['error' => 'Unauthorized.'], 403);
+        }
 
         $message = Message::create([
-            'sender_id' => Auth::id(),
-            'receiver_id' => $validated['receiver_id'],
-            'message' => $validated['message'],
+            'sender_id' => $sender->id,
+            'receiver_id' => $receiver->id,
+            'message' => $request->message,
         ]);
 
-        broadcast(new \App\Events\MessageSent($message))->toOthers();
+        broadcast(new MessageSent($message))->toOthers();
 
         return response()->json($message);
     }

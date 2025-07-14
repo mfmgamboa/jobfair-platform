@@ -3,27 +3,48 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Message;
 use App\Models\User;
-use App\Events\ChatMessageSent;
+use Illuminate\Support\Facades\Auth;
+use App\Events\MessageSent;
 
 class ChatController extends Controller
 {
+    public function index()
+    {
+        $user = Auth::user();
+        $contacts = $user->hasRole('employer') 
+            ? $user->receivedApplications()->with('jobseeker')->get()->pluck('jobseeker')
+            : $user->applications()->with('employer')->get()->pluck('employer');
+
+        return response()->json($contacts);
+    }
+
+    public function fetchMessages(User $user)
+    {
+        $authUserId = Auth::id();
+
+        $messages = Message::where(function ($q) use ($user, $authUserId) {
+                $q->where('from_id', $authUserId)->where('to_id', $user->id);
+            })->orWhere(function ($q) use ($user, $authUserId) {
+                $q->where('from_id', $user->id)->where('to_id', $authUserId);
+            })
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json($messages);
+    }
+
     public function sendMessage(Request $request)
     {
-        $request->validate([
-            'receiver_id' => 'required|exists:users,id',
-            'message' => 'required|string|max:1000',
+        $message = Message::create([
+            'from_id' => Auth::id(),
+            'to_id' => $request->to_id,
+            'message' => $request->message,
         ]);
 
-        $sender = auth()->user();
-        $receiver = User::findOrFail($request->receiver_id);
-        $message = $request->message;
+        broadcast(new MessageSent($message))->toOthers();
 
-        // Broadcast the event
-        broadcast(new ChatMessageSent($sender, $receiver, $message))->toOthers();
-
-        return response()->json([
-            'status' => 'Message sent!',
-        ]);
+        return response()->json($message);
     }
 }
