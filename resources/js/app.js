@@ -1,7 +1,22 @@
 import './bootstrap';
+import { createApp } from 'vue';
+import ChatApp from './components/ChatApp.vue';
 
-import Alpine from 'alpinejs';
+const app = createApp(ChatApp);
+app.mount('#chat-app');
 
-window.Alpine = Alpine;
+import Echo from 'laravel-echo';
 
-Alpine.start();
+window.Pusher = require('pusher-js');
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: import.meta.env.VITE_PUSHER_APP_KEY,
+    wsHost: import.meta.env.VITE_PUSHER_HOST ?? window.location.hostname,
+    wsPort: import.meta.env.VITE_PUSHER_PORT ?? 6001,
+    forceTLS: false,
+    disableStats: true,
+    enabledTransports: ['ws', 'wss'],
+});
+
+console.log('Echo initialized...');

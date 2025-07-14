@@ -35,4 +35,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+    * Define the private channel the user listens to.
+    */
+    public function receivesBroadcastOn()
+    {
+    	return 'chat.' . $this->id;
+    }
 }
