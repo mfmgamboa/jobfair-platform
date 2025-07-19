@@ -21,19 +21,18 @@ if (token) {
 }
 
 /**
- * Laravel Echo + Socket.IO configuration for WebSockets via Soketi
- * This replaces Pusher and uses a self-hosted socket server on port 6001
+ * ✅ Laravel Echo + Pusher (NOT Soketi or socket.io)
  */
 
 import Echo from 'laravel-echo';
-import io from 'socket.io-client';
+import Pusher from 'pusher-js';
 
-window.io = io;
+window.Pusher = Pusher;
 
 window.Echo = new Echo({
-    broadcaster: 'socket.io',
-    host: window.location.hostname + ':6001',
-    transports: ['websocket'],
-    forceTLS: false,
-    disableStats: true,
+    broadcaster: 'pusher',
+    key: import.meta.env.VITE_PUSHER_APP_KEY,
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+    forceTLS: true,
+    encrypted: true,
 });

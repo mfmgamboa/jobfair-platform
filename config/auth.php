@@ -22,7 +22,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        // Removed 'government' guard
+
+        'government' => [
+            'driver' => 'session',
+            'provider' => 'government_users',
+        ],
     ],
 
     /*
@@ -35,7 +39,11 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-        // Removed 'government_users' provider
+
+        'government_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\GovernmentUser::class, // ✅ Make sure this model exists
+        ],
     ],
 
     /*
@@ -46,6 +54,13 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'government_users' => [
+            'provider' => 'government_users',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,

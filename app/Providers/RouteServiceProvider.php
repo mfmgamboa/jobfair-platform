@@ -8,13 +8,10 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 class RouteServiceProvider extends ServiceProvider
 {
     /**
-     * The path to the "home" route for your application.
-     *
-     * This is used by Laravel authentication to redirect users after login.
-     *
-     * @var string
+     * This constant is unused in this project and kept for compatibility.
+     * We override redirect logic in LoginController.
      */
-    public const HOME = '/redirect-after-login';
+    public const HOME = '/';
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -22,9 +19,11 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->routes(function () {
+            // Web routes
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
 
+            // API routes
             Route::prefix('api')
                 ->middleware('api')
                 ->group(base_path('routes/api.php'));

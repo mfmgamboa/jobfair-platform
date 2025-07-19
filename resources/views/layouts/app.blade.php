@@ -33,7 +33,7 @@
     </div>
 
     <!-- Floating Chat App Mount -->
-    <div id="chat-app">
+    <div id="chat-app"></div>
         <chat-widget></chat-widget>
     </div>
 </body>
