@@ -10,8 +10,11 @@
                 ({{ Auth::user()->getRoleNames()->first() }})
             </div>
         </div>
-        <!-- ✅ This tag must match the Vue component -->
-        <chat-app></chat-app>
+
+        <!-- ✅ Vue app will mount here -->
+        <div id="chat-app">
+            <chat-app></chat-app>
+        </div>
     </div>
 </div>
 @endsection
