@@ -1,3 +1,71 @@
+/* Tailwind Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Root custom properties */
+:root {
+    --primary: #004080;
+    --accent: #0074cc;
+    --soft-bg: #f4f6fa;
+    --card-bg: #ffffff;
+    --text-main: #333333;
+    --border-color: #e0e6ed;
+    --placeholder: #9ca3af; /* Tailwind's text-gray-400 */
+}
+
+/* Global body styles */
+body {
+    background-color: var(--soft-bg);
+    color: var(--text-main);
+    font-family: 'Figtree', sans-serif;
+}
+
+/* Input placeholders */
+input::placeholder,
+textarea::placeholder {
+    color: var(--placeholder);
+    opacity: 1;
+}
+
+/* Customize buttons */
+button.bg-[#0074cc]:hover {
+    background-color: #005fa3 !important;
+}
+
+/* Customize card appearance */
+.card-soft {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+/* Rounded input appearance */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea {
+    border-radius: 0.5rem;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    padding: 0.625rem 0.75rem;
+}
+
+/* Button aesthetics */
+.btn-primary {
+    @apply bg-[#0074cc] hover:bg-[#005fa3] text-white font-semibold text-sm px-4 py-2 rounded-md transition;
+}
+
+/* Add light hover for links */
+a:hover {
+    color: var(--primary);
+}
+
+/* Logo tweak (if needed) */
+img[alt="JobQuest Logo"] {
+    max-height: 64px;
+    width: auto;
+    object-fit: contain;
+}

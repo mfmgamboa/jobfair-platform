@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,6 +22,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin User',
             'email' => 'admin@test.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => Carbon::now(),
         ]);
         $admin->assignRole('admin');
 
@@ -29,6 +31,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Employer User',
             'email' => 'employer@test.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => Carbon::now(),
         ]);
         $employer->assignRole('employer');
 
@@ -37,6 +40,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Jobseeker User',
             'email' => 'jobseeker@test.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => Carbon::now(),
         ]);
         $jobseeker->assignRole('jobseeker');
     }

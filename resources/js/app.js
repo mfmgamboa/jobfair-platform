@@ -1,6 +1,7 @@
-const chatAppDiv = document.getElementById('chat-app');
-const username = chatAppDiv.dataset.username;
+import './bootstrap';
 
-const app = createApp(App);
-app.provide('username', username); // Make username available to child components
-app.mount('#chat-app');
+import Alpine from 'alpinejs';
+
+window.Alpine = Alpine;
+
+Alpine.start();

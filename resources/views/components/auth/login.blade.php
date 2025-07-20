@@ -1,46 +1,63 @@
-<x-guest-layout>
-    <x-auth-card>
-        <x-auth-session-status class="mb-4" :status="session('status')" />
-        <x-auth-validation-errors class="mb-4" :errors="$errors" />
+@extends('layouts.app') {{-- Or use a layout you have like layouts.guest --}}
+
+@section('content')
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="w-full max-w-md p-8 bg-white rounded shadow">
+        @if (session('status'))
+            <div class="mb-4 text-sm text-green-600">
+                {{ session('status') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="mb-4">
+                <ul class="list-disc list-inside text-sm text-red-600">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
 
             <!-- Email Address -->
-            <div>
-                <x-label for="email" value="Email" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+            <div class="mb-4">
+                <label for="email" class="block font-medium text-sm text-gray-700">Email</label>
+                <input id="email" type="email" name="email" value="{{ old('email') }}"
+                    required autofocus autocomplete="username"
+                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
             </div>
 
             <!-- Password -->
-            <div class="mt-4">
-                <x-label for="password" value="Password" />
-                <x-input id="password" class="block mt-1 w-full"
-                                type="password"
-                                name="password"
-                                required
-                                autocomplete="current-password" />
+            <div class="mb-4">
+                <label for="password" class="block font-medium text-sm text-gray-700">Password</label>
+                <input id="password" type="password" name="password" required autocomplete="current-password"
+                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
             </div>
 
             <!-- Remember Me -->
-            <div class="block mt-4">
-                <label for="remember_me" class="flex items-center">
+            <div class="block mb-4">
+                <label for="remember_me" class="inline-flex items-center">
                     <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" name="remember">
-                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Remember me</span>
+                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
                 </label>
             </div>
 
-            <div class="flex items-center justify-between mt-4">
+            <div class="flex items-center justify-between">
                 @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100" href="{{ route('password.request') }}">
-                        {{ __('Forgot your password?') }}
+                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
+                        Forgot your password?
                     </a>
                 @endif
 
-                <x-button class="ml-3">
-                    {{ __('Log in') }}
-                </x-button>
+                <button type="submit"
+                    class="ml-3 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                    Log in
+                </button>
             </div>
         </form>
-    </x-auth-card>
-</x-guest-layout>
+    </div>
+</div>
+@endsection
