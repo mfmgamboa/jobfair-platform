@@ -1,8 +1,6 @@
-import './bootstrap';
-import { createApp } from 'vue';
-import ChatApp from './components/ChatApp.vue';
+const chatAppDiv = document.getElementById('chat-app');
+const username = chatAppDiv.dataset.username;
 
-const app = createApp(ChatApp);
+const app = createApp(App);
+app.provide('username', username); // Make username available to child components
 app.mount('#chat-app');
-
-console.log('Vue ChatApp mounted...');

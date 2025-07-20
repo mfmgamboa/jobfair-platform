@@ -1,73 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Register - JobQuest</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        body {
-            background: linear-gradient(to bottom right, #3B82F6, #9333EA);
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
-</head>
-<body class="min-h-screen flex items-center justify-center px-4">
-    <div class="bg-white rounded-2xl shadow-lg w-full max-w-md p-8">
-        <div class="text-center mb-6">
-            <img src="/images/jobquest-logo.png" alt="JobQuest Logo" class="mx-auto w-24 mb-4">
-            <h1 class="text-2xl font-bold text-gray-700">Create Account</h1>
-            <p class="text-sm text-gray-500">Register below to get started</p>
-        </div>
+<x-guest-layout>
+    <x-auth-card>
+        <!-- Validation Errors -->
+        <x-auth-validation-errors class="mb-4" :errors="$errors" />
 
-        @if ($errors->any())
-            <div class="mb-4 text-red-500 text-sm">
-                <ul class="list-disc pl-5">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('register') }}" class="space-y-5">
+        <form method="POST" action="{{ route('register') }}">
             @csrf
 
+            <!-- Name -->
             <div>
-                <label class="block text-sm font-medium text-gray-700">Name</label>
-                <input id="name" name="name" type="text" value="{{ old('name') }}" required
-                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <x-label for="name" value="Name" />
+                <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Email</label>
-                <input id="email" name="email" type="email" value="{{ old('email') }}" required
-                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <!-- Email Address -->
+            <div class="mt-4">
+                <x-label for="email" value="Email" />
+                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="email" />
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Password</label>
-                <input id="password" name="password" type="password" required
-                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <!-- Password -->
+            <div class="mt-4">
+                <x-label for="password" value="Password" />
+                <x-input id="password" class="block mt-1 w-full"
+                                type="password"
+                                name="password"
+                                required
+                                autocomplete="new-password" />
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                <input id="password_confirmation" name="password_confirmation" type="password" required
-                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <!-- Confirm Password -->
+            <div class="mt-4">
+                <x-label for="password_confirmation" value="Confirm Password" />
+                <x-input id="password_confirmation" class="block mt-1 w-full"
+                                type="password"
+                                name="password_confirmation"
+                                required
+                                autocomplete="new-password" />
             </div>
 
-            <div class="flex items-center justify-between text-sm text-gray-600">
-                <a href="{{ route('login') }}" class="text-blue-500 hover:underline">
-                    Already registered?
+            <div class="flex items-center justify-end mt-4">
+                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100" href="{{ route('login') }}">
+                    {{ __('Already registered?') }}
                 </a>
-            </div>
 
-            <button type="submit"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold">
-                Register
-            </button>
+                <x-button class="ml-4">
+                    {{ __('Register') }}
+                </x-button>
+            </div>
         </form>
-    </div>
-</body>
-</html>
+    </x-auth-card>
+</x-guest-layout>

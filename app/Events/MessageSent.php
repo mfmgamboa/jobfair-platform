@@ -22,7 +22,7 @@ class MessageSent implements ShouldBroadcastNow
      */
     public function __construct(Message $message, User $sender)
     {
-        $this->message = $message;
+        $this->message = $message->load('sender'); // Make sure sender is loaded
         $this->sender = $sender;
     }
 
@@ -31,6 +31,7 @@ class MessageSent implements ShouldBroadcastNow
      */
     public function broadcastOn(): Channel
     {
+        // Broadcast to the receiver's private channel
         return new Channel('chat.' . $this->message->receiver_id);
     }
 
@@ -53,6 +54,11 @@ class MessageSent implements ShouldBroadcastNow
             'sender_id'   => $this->sender->id,
             'receiver_id' => $this->message->receiver_id,
             'created_at'  => $this->message->created_at->toDateTimeString(),
+            'sender' => [
+                'id' => $this->sender->id,
+                'name' => $this->sender->name,
+            ],
+            'is_read' => false
         ];
     }
 }
