@@ -1,35 +1,45 @@
-<x-app-layout>
-    <div class="px-6 py-8 bg-[#f4f6fa] min-h-screen">
-        <h1 class="text-3xl font-bold text-[#004080] mb-6">Admin Dashboard</h1>
+@extends('layouts.app')
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow p-6 border-l-4 border-[#0074cc]">
-                <h2 class="text-sm text-gray-500 uppercase">Total Employers</h2>
-                <p class="text-2xl font-semibold text-[#004080] mt-1">124</p>
-            </div>
-            <div class="bg-white rounded-xl shadow p-6 border-l-4 border-[#ff8c00]">
-                <h2 class="text-sm text-gray-500 uppercase">Total Jobseekers</h2>
-                <p class="text-2xl font-semibold text-[#004080] mt-1">842</p>
-            </div>
-            <div class="bg-white rounded-xl shadow p-6 border-l-4 border-[#0074cc]">
-                <h2 class="text-sm text-gray-500 uppercase">Job Fairs</h2>
-                <p class="text-2xl font-semibold text-[#004080] mt-1">8 Active</p>
-            </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="bg-white rounded-xl shadow p-6">
-            <h2 class="text-xl font-bold text-[#004080] mb-4">Recent Activity</h2>
-            <ul class="space-y-3 text-sm text-gray-700">
-                <li>✅ 5 Employers registered today</li>
-                <li>📄 New job fair proposal submitted</li>
-                <li>💬 Jobseeker feedback received</li>
-                <li>🔍 23 job applications submitted</li>
-            </ul>
-        </div>
-
-        <!-- Floating Chat Icon -->
-        <x-floating-chat />
+@section('content')
+<div class="max-w-7xl mx-auto">
+    <!-- Dashboard Heading -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h1 class="text-2xl font-bold text-[#0074cc]">Admin Dashboard</h1>
+        <p class="text-gray-600 mt-2">Welcome back, {{ Auth::user()->name }}!</p>
     </div>
-</x-app-layout>
+
+    <!-- Dashboard Widgets -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Users Summary -->
+        <div class="bg-white rounded-lg shadow-md p-5 border-t-4 border-[#0074cc]">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Total Users</h2>
+            <p class="text-3xl font-bold text-[#0074cc]">1,234</p>
+        </div>
+
+        <!-- Employers Summary -->
+        <div class="bg-white rounded-lg shadow-md p-5 border-t-4 border-[#f7941d]">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Employers</h2>
+            <p class="text-3xl font-bold text-[#f7941d]">456</p>
+        </div>
+
+        <!-- Jobseekers Summary -->
+        <div class="bg-white rounded-lg shadow-md p-5 border-t-4 border-[#00bfff]">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Jobseekers</h2>
+            <p class="text-3xl font-bold text-[#00bfff]">778</p>
+        </div>
+    </div>
+
+    <!-- Recent Activity (placeholder) -->
+    <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h3>
+        <ul class="list-disc list-inside text-sm text-gray-700">
+            <li>User John Doe registered</li>
+            <li>Employer ABC Corp posted a new job</li>
+            <li>Jobseeker Jane applied to “Web Developer”</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Floating Chat Component -->
+<x-floating-chat :user-id="auth()->id()" :recipient-id="null" />
+@endsection

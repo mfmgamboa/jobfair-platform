@@ -4,45 +4,39 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Message;
-use App\Models\User;
-use App\Events\MessageSent;
 use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
-    /**
-     * Show all messages for the logged-in user.
-     */
-    public function index()
+    // Fetch messages between two users
+    public function index(Request $request)
     {
-        $user = Auth::user();
+        $userId = Auth::id();
+        $receiverId = $request->input('receiver_id');
 
-        // Get users they've messaged with
-        $contacts = User::where('id', '!=', $user->id)->get();
+        $messages = Message::where(function ($query) use ($userId, $receiverId) {
+            $query->where('sender_id', $userId)->where('receiver_id', $receiverId);
+        })->orWhere(function ($query) use ($userId, $receiverId) {
+            $query->where('sender_id', $receiverId)->where('receiver_id', $userId);
+        })->orderBy('created_at')->get();
 
-        return view('messages.index', compact('contacts'));
+        return response()->json($messages);
     }
 
-    /**
-     * Store a new message and broadcast it.
-     */
+    // Send a new message
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'receiver_id' => 'required|exists:users,id',
-            'body' => 'required|string|max:1000',
+            'message' => 'required|string|max:1000',
         ]);
-
-        $sender = Auth::user();
 
         $message = Message::create([
-            'sender_id' => $sender->id,
-            'receiver_id' => $request->receiver_id,
-            'body' => $request->body,
+            'sender_id' => Auth::id(),
+            'receiver_id' => $validated['receiver_id'],
+            'message' => $validated['message'],
         ]);
 
-        broadcast(new MessageSent($message, $sender))->toOthers();
-
-        return response()->json(['message' => 'Message sent!', 'data' => $message]);
+        return response()->json($message, 201);
     }
 }

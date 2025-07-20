@@ -1,51 +1,45 @@
-<x-app-layout>
-    <div class="px-6 py-8 bg-[#f4f6fa] min-h-screen">
-        <h1 class="text-3xl font-bold text-[#004080] mb-6">Employer Dashboard</h1>
+@extends('layouts.app')
 
-        <!-- Action Buttons -->
-        <div class="flex flex-wrap gap-4 mb-8">
-            <a href="{{ route('jobs.create') }}"
-               class="inline-block bg-[#ff8c00] hover:bg-[#e67600] text-white px-6 py-3 rounded-lg shadow transition">
-                ➕ Post a New Job
-            </a>
-            <a href="#" class="inline-block bg-[#0074cc] hover:bg-[#005fa3] text-white px-6 py-3 rounded-lg shadow transition">
-                📂 View Applications
-            </a>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow p-6 border-l-4 border-[#0074cc]">
-                <h2 class="text-sm text-gray-500 uppercase">Open Positions</h2>
-                <p class="text-2xl font-semibold text-[#004080] mt-1">5</p>
-            </div>
-            <div class="bg-white rounded-xl shadow p-6 border-l-4 border-[#ff8c00]">
-                <h2 class="text-sm text-gray-500 uppercase">Total Applicants</h2>
-                <p class="text-2xl font-semibold text-[#004080] mt-1">72</p>
-            </div>
-            <div class="bg-white rounded-xl shadow p-6 border-l-4 border-[#0074cc]">
-                <h2 class="text-sm text-gray-500 uppercase">Interviews Scheduled</h2>
-                <p class="text-2xl font-semibold text-[#004080] mt-1">8</p>
-            </div>
-        </div>
-
-        <!-- Job Listings -->
-        <div class="bg-white rounded-xl shadow p-6">
-            <h2 class="text-xl font-bold text-[#004080] mb-4">Your Recent Job Posts</h2>
-            <ul class="divide-y divide-gray-200">
-                <li class="py-3">
-                    <strong>Software Developer</strong> — 12 applicants — <span class="text-sm text-gray-500">Posted 2 days ago</span>
-                </li>
-                <li class="py-3">
-                    <strong>Marketing Coordinator</strong> — 8 applicants — <span class="text-sm text-gray-500">Posted 1 week ago</span>
-                </li>
-                <li class="py-3">
-                    <strong>UX Designer</strong> — 5 applicants — <span class="text-sm text-gray-500">Posted 3 weeks ago</span>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Floating Chat -->
-        <x-floating-chat />
+@section('content')
+<div class="max-w-7xl mx-auto">
+    <!-- Dashboard Header -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h1 class="text-2xl font-bold text-[#0074cc]">Employer Dashboard</h1>
+        <p class="text-gray-600 mt-2">Welcome back, {{ Auth::user()->name }}!</p>
     </div>
-</x-app-layout>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Jobs Posted -->
+        <div class="bg-white rounded-lg shadow-md p-5 border-t-4 border-[#0074cc]">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Jobs Posted</h2>
+            <p class="text-3xl font-bold text-[#0074cc]">12</p>
+        </div>
+
+        <!-- Applications Received -->
+        <div class="bg-white rounded-lg shadow-md p-5 border-t-4 border-[#f7941d]">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Applications</h2>
+            <p class="text-3xl font-bold text-[#f7941d]">87</p>
+        </div>
+
+        <!-- Shortlisted Candidates -->
+        <div class="bg-white rounded-lg shadow-md p-5 border-t-4 border-[#00bfff]">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Shortlisted</h2>
+            <p class="text-3xl font-bold text-[#00bfff]">9</p>
+        </div>
+    </div>
+
+    <!-- Recent Activity (placeholder) -->
+    <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h3>
+        <ul class="list-disc list-inside text-sm text-gray-700">
+            <li>New job “Frontend Developer” posted</li>
+            <li>5 new applications received today</li>
+            <li>Interview scheduled with John Doe</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Floating Chat -->
+<x-floating-chat :user-id="auth()->id()" :recipient-id="null" />
+@endsection

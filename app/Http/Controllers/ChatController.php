@@ -3,58 +3,81 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Message;
-use Illuminate\Support\Facades\Broadcast;
 use App\Models\User;
+use App\Models\Chat;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
 {
-    /**
-     * Fetch latest 50 messages (for testing or general chat).
-     */
+    // View for testing (not required if you're using Vue only)
     public function index()
     {
-        $messages = Message::with('user')
-            ->latest()
-            ->take(50)
-            ->get()
-            ->reverse();
+        return view('chat.index');
+    }
+
+    // Fetch all messages between the current user and receiver
+    public function fetchMessages($receiverId)
+    {
+        $userId = Auth::id();
+
+        $messages = Chat::where(function ($query) use ($userId, $receiverId) {
+            $query->where('sender_id', $userId)
+                  ->where('receiver_id', $receiverId);
+        })->orWhere(function ($query) use ($userId, $receiverId) {
+            $query->where('sender_id', $receiverId)
+                  ->where('receiver_id', $userId);
+        })->orderBy('created_at', 'asc')->get();
 
         return response()->json($messages);
     }
 
-    /**
-     * Send a new message to a specific user.
-     */
-    public function store(Request $request)
+    // Send message from current user to receiver
+    public function sendMessage(Request $request)
     {
-        // Validate input
         $request->validate([
-            'body' => 'required|string|max:1000',
-            'receiver_id' => 'required|exists:users,id'
+            'message' => 'required|string',
+            'receiver_id' => 'required|exists:users,id',
         ]);
 
-        // Create the message
-        $message = Message::create([
-            'user_id' => Auth::id(),
-            'receiver_id' => $request->receiver_id,
-            'body' => $request->body
-        ]);
+        try {
+            $chat = Chat::create([
+                'sender_id' => Auth::id(),
+                'receiver_id' => $request->receiver_id,
+                'message' => $request->message,
+            ]);
 
-        // Load relationships
-        $message->load('user');
+            Log::info('Message sent:', $chat->toArray());
 
-        // Get the sender
-        $sender = Auth::user();
+            return response()->json(['success' => true, 'chat' => $chat], 201);
+        } catch (\Exception $e) {
+            Log::error('Chat send error:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Failed to send message'], 500);
+        }
+    }
 
-        // Broadcast to the receiver's private channel
-        broadcast(new \App\Events\MessageSent($message, $sender))->toOthers();
+    // Return recent conversation partners (grouped by other user)
+    public function recentConversations()
+    {
+        $userId = Auth::id();
 
-        // Return message with sender info
-        return response()->json([
-            'message' => $message,
-            'sender' => $sender
-        ]);
+        $chats = Chat::where('sender_id', $userId)
+            ->orWhere('receiver_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Group by the other participant
+        $conversations = $chats->groupBy(function ($chat) use ($userId) {
+            return $chat->sender_id === $userId ? $chat->receiver_id : $chat->sender_id;
+        });
+
+        return response()->json($conversations);
+    }
+
+    // Used by FloatingChat to get the name of the recipient
+    public function recipientName($receiverId)
+    {
+        $user = User::find($receiverId);
+        return response()->json(['name' => $user?->name ?? 'Unknown']);
     }
 }
